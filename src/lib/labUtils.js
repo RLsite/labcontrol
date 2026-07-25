@@ -1,15 +1,15 @@
-// עזרים למערכת ניהול המעבדה
+// עזרים למערכת ניהול המעבדה (ללא תוויות — התוויות מגיעות מ-i18n)
 
 export const DEVICE_STATUS = {
-  available: { label: "פנוי לשימוש", color: "emerald", dot: "bg-emerald-500" },
-  in_use: { label: "בשימוש כעת", color: "amber", dot: "bg-amber-500" },
-  maintenance: { label: "תקול / בבדיקה", color: "rose", dot: "bg-rose-500" }
+  available: { color: "emerald", dot: "bg-emerald-500" },
+  in_use: { color: "amber", dot: "bg-amber-500" },
+  maintenance: { color: "rose", dot: "bg-rose-500" }
 };
 
 export const USER_STATUS = {
-  pending: { label: "ממתין לאישור", color: "amber" },
-  approved: { label: "מאושר", color: "emerald" },
-  blocked: { label: "חסום", color: "rose" }
+  pending: { color: "amber" },
+  approved: { color: "emerald" },
+  blocked: { color: "rose" }
 };
 
 export function formatDuration(totalSeconds) {
@@ -22,11 +22,11 @@ export function formatDuration(totalSeconds) {
   return `${pad(m)}:${pad(sec)}`;
 }
 
-export function formatDateTime(iso) {
+export function formatDateTime(iso, lang = "he") {
   if (!iso) return "";
   try {
     const d = new Date(iso);
-    return d.toLocaleString("he-IL", {
+    return d.toLocaleString(lang === "he" ? "he-IL" : "en-US", {
       day: "2-digit", month: "2-digit", year: "numeric",
       hour: "2-digit", minute: "2-digit"
     });
@@ -35,11 +35,21 @@ export function formatDateTime(iso) {
   }
 }
 
-export function formatDate(iso) {
+export function formatDate(iso, lang = "he") {
   if (!iso) return "";
   try {
     const d = new Date(iso);
-    return d.toLocaleDateString("he-IL", { weekday: "long", day: "2-digit", month: "long" });
+    return d.toLocaleDateString(lang === "he" ? "he-IL" : "en-US", { weekday: "long", day: "2-digit", month: "long" });
+  } catch {
+    return iso;
+  }
+}
+
+export function formatTime(iso, lang = "he") {
+  if (!iso) return "";
+  try {
+    const d = new Date(iso);
+    return d.toLocaleTimeString(lang === "he" ? "he-IL" : "en-US", { hour: "2-digit", minute: "2-digit" });
   } catch {
     return iso;
   }
@@ -61,7 +71,6 @@ export function googleCalendarUrl({ title, startISO, endISO, details, location }
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-// לוקליזציה של שם חודש לקיבוץ
 export function dayKey(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
