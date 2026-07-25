@@ -21,6 +21,7 @@ export default function LabCalendar() {
   const [devices, setDevices] = useState([]);
   const [showReserve, setShowReserve] = useState(false);
   const [prefillStart, setPrefillStart] = useState("");
+  const [selectedDeviceId, setSelectedDeviceId] = useState("all");
 
   // For main admin: load all labs. For others: their lab.
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function LabCalendar() {
     }
   }, [selectedLabId]);
 
-  useEffect(() => { loadData(); }, [loadData]);
+  useEffect(() => { loadData(); setSelectedDeviceId("all"); }, [loadData]);
 
   if (labUser.loading) {
     return (
@@ -63,10 +64,17 @@ export default function LabCalendar() {
     );
   }
 
+  const visibleReservations = selectedDeviceId === "all"
+    ? reservations
+    : reservations.filter((r) => r.device_id === selectedDeviceId);
+  const modalDevices = selectedDeviceId === "all"
+    ? devices
+    : devices.filter((d) => d.id === selectedDeviceId);
+
   // group by day
   const grouped = (() => {
     const map = new Map();
-    reservations.forEach((r) => {
+    visibleReservations.forEach((r) => {
       const k = dayKey(r.start_time);
       if (!map.has(k)) map.set(k, []);
       map.get(k).push(r);
@@ -121,7 +129,16 @@ export default function LabCalendar() {
         <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-3xl glass animate-pulse" />)}</div>
       ) : (
         <div className="space-y-6">
-          <LocalCalendar reservations={reservations} lang={lang} onDayClick={handleDayClick} />
+          {devices.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              <DeviceTab active={selectedDeviceId === "all"} onClick={() => setSelectedDeviceId("all")} label={t("lab.allDevices")} />
+              {devices.map((d) => (
+                <DeviceTab key={d.id} active={selectedDeviceId === d.id} onClick={() => setSelectedDeviceId(d.id)} label={d.name} />
+              ))}
+            </div>
+          )}
+
+          <LocalCalendar reservations={visibleReservations} lang={lang} onDayClick={handleDayClick} />
 
           {devices.length === 0 && (
             <div className="rounded-3xl glass border-dashed border-white/15 py-6 text-center">
@@ -166,9 +183,22 @@ export default function LabCalendar() {
       )}
 
       {showReserve && (
-        <ReservationModal devices={devices} user={labUser.user} labId={selectedLabId} initialStart={prefillStart}
+        <ReservationModal devices={modalDevices.length > 0 ? modalDevices : devices} user={labUser.user} labId={selectedLabId} initialStart={prefillStart}
           onClose={() => setShowReserve(false)} onSaved={loadData} />
       )}
     </Layout>
+  );
+}
+
+function DeviceTab({ active, onClick, label }) {
+  return (
+    <button onClick={onClick}
+      className={`shrink-0 h-8 px-3.5 rounded-full text-xs font-medium transition-colors border ${
+        active
+          ? "aestro-gradient text-white border-transparent shadow-md shadow-primary/20"
+          : "text-slate-300 border-white/10 bg-white/[0.03] hover:bg-white/[0.08]"
+      }`}>
+      {label}
+    </button>
   );
 }
