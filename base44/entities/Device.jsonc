@@ -1,0 +1,41 @@
+{
+  "name": "Device",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "in_use",
+        "maintenance"
+      ],
+      "default": "available"
+    },
+    "category": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "requires_training": {
+      "type": "boolean",
+      "default": true
+    },
+    "training_name": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "status"
+  ]
+}
