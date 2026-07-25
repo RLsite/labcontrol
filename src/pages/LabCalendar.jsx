@@ -119,16 +119,17 @@ export default function LabCalendar() {
 
       {loading ? (
         <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-3xl glass animate-pulse" />)}</div>
-      ) : devices.length === 0 ? (
-        <div className="rounded-3xl glass border-dashed border-white/15 py-16 text-center">
-          <Inbox className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm text-slate-400">{t("reserve.noDevices")}</p>
-        </div>
       ) : (
         <div className="space-y-6">
           <LocalCalendar reservations={reservations} lang={lang} onDayClick={handleDayClick} />
 
-          {grouped.length === 0 && (
+          {devices.length === 0 && (
+            <div className="rounded-3xl glass border-dashed border-white/15 py-6 text-center">
+              <p className="text-sm text-slate-400">{t("reserve.noDevices")}</p>
+            </div>
+          )}
+
+          {grouped.length === 0 && devices.length > 0 && (
             <div className="rounded-3xl glass border-dashed border-white/15 py-10 text-center">
               <Inbox className="w-8 h-8 text-slate-600 mx-auto mb-2" />
               <p className="text-sm text-slate-400">{t("lab.calendarEmpty")}</p>
