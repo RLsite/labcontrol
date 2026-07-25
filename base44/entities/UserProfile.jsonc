@@ -11,7 +11,9 @@
     "role": {
       "type": "string",
       "enum": [
-        "admin",
+        "main_admin",
+        "lab_admin",
+        "senior_user",
         "user"
       ],
       "default": "user"
@@ -25,6 +27,9 @@
       ],
       "default": "pending"
     },
+    "lab_id": {
+      "type": "string"
+    },
     "certifications": {
       "type": "array",
       "items": {
@@ -35,6 +40,7 @@
   },
   "required": [
     "email",
-    "status"
+    "status",
+    "role"
   ]
 }

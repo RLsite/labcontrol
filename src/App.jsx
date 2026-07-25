@@ -9,8 +9,8 @@ import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LanguageProvider } from '@/lib/i18n';
 import Home from '@/pages/Home';
-import Admin from '@/pages/Admin';
-import Schedule from '@/pages/Schedule';
+import LabCalendar from '@/pages/LabCalendar';
+import Manage from '@/pages/Manage';
 import Help from '@/pages/Help';
 import Settings from '@/pages/Settings';
 // Add page imports here
@@ -44,10 +44,10 @@ const AuthenticatedApp = () => {
       {/* Add your page Route elements here */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/" element={<Home />} />
-        <Route path="/schedule" element={<Schedule />} />
+        <Route path="/calendar" element={<LabCalendar />} />
         <Route path="/help" element={<Help />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/manage" element={<Manage />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

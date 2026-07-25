@@ -23,19 +23,20 @@
     "location": {
       "type": "string"
     },
-    "image_url": {
-      "type": "string"
-    },
     "requires_training": {
       "type": "boolean",
       "default": true
     },
     "training_name": {
       "type": "string"
+    },
+    "lab_id": {
+      "type": "string"
     }
   },
   "required": [
     "name",
-    "status"
+    "status",
+    "lab_id"
   ]
 }

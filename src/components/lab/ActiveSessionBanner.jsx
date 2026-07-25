@@ -23,12 +23,12 @@ export default function ActiveSessionBanner({ session, onCheckout }) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-l from-indigo-600 via-violet-600 to-fuchsia-600 text-white shadow-lg shadow-indigo-200">
-      <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_left,white,transparent_60%)]" />
+    <div className="relative overflow-hidden rounded-3xl aestro-gradient text-white shadow-xl shadow-primary/30">
+      <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_top_right,white,transparent_55%)]" />
       <div className="relative p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+          <div className="relative shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center">
               <Cpu className="w-6 h-6" />
             </div>
             <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
@@ -36,30 +36,25 @@ export default function ActiveSessionBanner({ session, onCheckout }) {
               <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-400 border-2 border-white" />
             </span>
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs font-medium text-white/80">
               <Activity className="w-3.5 h-3.5" />
               {t("session.active")}
             </div>
-            <div className="text-lg font-bold mt-0.5">{session.device_name}</div>
-            <div className="text-xs text-white/70 mt-0.5">
-              {t("session.startedAt")}{formatTime(session.start_time, lang)}
-            </div>
+            <div className="text-lg font-heading font-bold mt-0.5 truncate">{session.device_name}</div>
+            <div className="text-xs text-white/70 mt-0.5">{t("session.startedAt")}{formatTime(session.start_time, lang)}</div>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 sm:gap-5">
           <div className="text-center">
             <div className="text-[11px] text-white/70 mb-1">{t("session.elapsed")}</div>
-            <div className="text-2xl sm:text-3xl font-mono font-bold tabular-nums tracking-tight">
-              {formatDuration(elapsed)}
-            </div>
+            <div className="text-2xl sm:text-3xl font-mono font-bold tabular-nums tracking-tight">{formatDuration(elapsed)}</div>
           </div>
           <Button
             onClick={handleCheckout}
             disabled={ending}
-            variant="secondary"
-            className="bg-white text-indigo-700 hover:bg-white/90 gap-2 font-semibold shadow-sm"
+            className="bg-white text-primary hover:bg-white/90 gap-2 font-semibold shadow-lg"
           >
             <Square className="w-4 h-4 fill-current" />
             {ending ? t("session.checkingOut") : t("session.checkout")}

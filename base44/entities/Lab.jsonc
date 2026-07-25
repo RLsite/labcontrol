@@ -1,0 +1,22 @@
+{
+  "name": "Lab",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "calendar_color": {
+      "type": "string",
+      "default": "violet"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

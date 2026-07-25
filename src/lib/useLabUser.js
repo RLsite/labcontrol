@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 
-// טוען את המשתמש הנוכחי + פרופיל המעבדה שלו.
-// משתמש חדש (ללא פרופיל וללא הרשאות מנהל) נוצר אוטומטית בסטטוס "ממתין לאישור".
+// Aestro user context: resolves role + lab.
+// main_admin = platform admin (Base44 User.role === 'admin').
+// others need a UserProfile with role + lab_id.
 export function useLabUser() {
   const [state, setState] = useState({ loading: true });
   const [reloadKey, setReloadKey] = useState(0);
@@ -13,11 +14,11 @@ export function useLabUser() {
     (async () => {
       try {
         const user = await base44.auth.me();
-        const isAdmin = user.role === "admin";
+        const isMainAdmin = user.role === "admin";
         const profiles = await base44.entities.UserProfile.filter({ email: user.email });
         let profile = profiles[0];
 
-        if (!profile && !isAdmin) {
+        if (!profile && !isMainAdmin) {
           profile = await base44.entities.UserProfile.create({
             full_name: user.full_name || user.email,
             email: user.email,
@@ -26,7 +27,14 @@ export function useLabUser() {
             certifications: []
           });
         }
-        if (!cancelled) setState({ loading: false, user, isAdmin, profile });
+
+        let lab = null;
+        if (profile?.lab_id) {
+          try { lab = await base44.entities.Lab.get(profile.lab_id); } catch { lab = null; }
+        }
+
+        const role = isMainAdmin ? "main_admin" : (profile?.role || "user");
+        if (!cancelled) setState({ loading: false, user, isMainAdmin, role, profile, lab });
       } catch (e) {
         if (!cancelled) setState({ loading: false, error: e });
       }

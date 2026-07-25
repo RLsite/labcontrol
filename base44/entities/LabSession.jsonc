@@ -32,6 +32,9 @@
     },
     "purpose": {
       "type": "string"
+    },
+    "lab_id": {
+      "type": "string"
     }
   },
   "required": [
@@ -39,6 +42,7 @@
     "device_name",
     "user_email",
     "start_time",
-    "status"
+    "status",
+    "lab_id"
   ]
 }

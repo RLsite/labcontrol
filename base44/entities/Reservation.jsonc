@@ -34,6 +34,9 @@
         "cancelled"
       ],
       "default": "upcoming"
+    },
+    "lab_id": {
+      "type": "string"
     }
   },
   "required": [
@@ -42,6 +45,7 @@
     "user_email",
     "start_time",
     "end_time",
-    "status"
+    "status",
+    "lab_id"
   ]
 }

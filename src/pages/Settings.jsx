@@ -10,50 +10,51 @@ export default function Settings() {
   const { t, lang, setLang } = useLang();
 
   return (
-    <Layout user={labUser.user} isAdmin={labUser.isAdmin} profile={labUser.profile}>
+    <Layout user={labUser.user} role={labUser.role} lab={labUser.lab}>
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t("settings.title")}</h1>
-        <p className="text-sm text-slate-500 mt-0.5 mb-6">{t("settings.subtitle")}</p>
+        <h1 className="text-xl sm:text-2xl font-heading font-bold text-white">{t("settings.title")}</h1>
+        <p className="text-sm text-slate-400 mt-0.5 mb-6">{t("settings.subtitle")}</p>
 
-        {/* שפה */}
-        <Section icon={<Languages className="w-5 h-5 text-indigo-600" />} title={t("settings.language.title")} desc={t("settings.language.desc")}>
-          <div className="grid grid-cols-2 gap-3 mt-3">
+        <div className="rounded-3xl glass p-5">
+          <div className="flex items-center gap-2">
+            <Languages className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-heading font-bold text-white">{t("settings.language.title")}</h2>
+          </div>
+          <p className="text-sm text-slate-400 mt-1 mb-3">{t("settings.language.desc")}</p>
+          <div className="grid grid-cols-2 gap-3">
             <LangOption active={lang === "he"} onClick={() => setLang("he")} label={t("settings.language.he")} />
             <LangOption active={lang === "en"} onClick={() => setLang("en")} label={t("settings.language.en")} />
           </div>
-        </Section>
+        </div>
 
-        {/* חיבורים */}
         <div className="mt-6">
           <div className="flex items-center gap-2 mb-3">
-            <Plug className="w-5 h-5 text-slate-600" />
-            <h2 className="text-lg font-bold text-slate-900">{t("settings.connections.title")}</h2>
+            <Plug className="w-5 h-5 text-slate-400" />
+            <h2 className="text-lg font-heading font-bold text-white">{t("settings.connections.title")}</h2>
           </div>
-          <p className="text-sm text-slate-500 mb-3">{t("settings.connections.desc")}</p>
+          <p className="text-sm text-slate-400 mb-3">{t("settings.connections.desc")}</p>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 flex items-start justify-between gap-4">
+          <div className="rounded-3xl glass p-5 flex items-start justify-between gap-4">
             <div className="flex items-start gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-emerald-500 flex items-center justify-center shrink-0">
                 <Calendar className="w-6 h-6 text-white" />
               </div>
               <div>
-                <div className="font-bold text-slate-900">{t("settings.connections.googleCalendar")}</div>
-                <p className="text-sm text-slate-500 mt-0.5 max-w-md">{t("settings.connections.googleCalendarDesc")}</p>
-                <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  {t("settings.connections.connected")}
+                <div className="font-heading font-bold text-white">{t("settings.connections.googleCalendar")}</div>
+                <p className="text-sm text-slate-400 mt-0.5 max-w-md">{t("settings.connections.googleCalendarDesc")}</p>
+                <div className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+                  <CheckCircle2 className="w-3.5 h-3.5" />{t("settings.connections.connected")}
                 </div>
               </div>
             </div>
             <a href="https://calendar.google.com/calendar" target="_blank" rel="noreferrer">
-              <Button variant="outline" className="gap-2">
-                <ExternalLink className="w-4 h-4" />
-                <span className="hidden sm:inline">{t("settings.connections.openBtn")}</span>
+              <Button variant="outline" className="gap-2 text-slate-200 border-white/10 hover:bg-white/5">
+                <ExternalLink className="w-4 h-4" /><span className="hidden sm:inline">{t("settings.connections.openBtn")}</span>
               </Button>
             </a>
           </div>
 
-          <div className="mt-3 flex items-start gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+          <div className="mt-3 flex items-start gap-2 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-2xl px-3 py-2.5">
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>{t("settings.connections.manageNote")}</span>
           </div>
@@ -63,29 +64,10 @@ export default function Settings() {
   );
 }
 
-function Section({ icon, title, desc, children }) {
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5">
-      <div className="flex items-center gap-2">
-        {icon}
-        <h2 className="text-lg font-bold text-slate-900">{title}</h2>
-      </div>
-      <p className="text-sm text-slate-500 mt-1">{desc}</p>
-      {children}
-    </div>
-  );
-}
-
 function LangOption({ active, onClick, label }) {
   return (
-    <button
-      onClick={onClick}
-      className={`rounded-xl border px-4 py-3 text-sm font-medium transition-all ${
-        active
-          ? "border-indigo-500 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-100"
-          : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
-      }`}
-    >
+    <button onClick={onClick}
+      className={`rounded-2xl border px-4 py-3 text-sm font-medium transition-all ${active ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/20" : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20"}`}>
       {label}
     </button>
   );
