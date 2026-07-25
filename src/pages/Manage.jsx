@@ -4,7 +4,8 @@ import { useLabUser } from "@/lib/useLabUser";
 import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
-import { UserCheck, Ban, Check, Wrench, ShieldCheck, RefreshCw, Users, Cpu, ChevronDown } from "lucide-react";
+import { UserCheck, Ban, Check, Wrench, ShieldCheck, RefreshCw, Users, Cpu, ChevronDown, Monitor } from "lucide-react";
+import { Link } from "react-router-dom";
 import { DEVICE_STATUS, USER_STATUS } from "@/lib/labUtils";
 
 const ROLES = ["lab_admin", "senior_user", "user"];
@@ -204,6 +205,9 @@ function DeviceAdminRow({ device, onSet, t, labName }) {
           <div className="font-medium text-white text-sm">{device.name}</div>
           <div className="text-[11px] text-slate-400">{device.location || device.category} · {labName}</div>
         </div>
+        <Link to={`/device/${device.id}`} target="_blank" rel="noreferrer" title="Kiosk terminal">
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-white/10"><Monitor className="w-4 h-4" /></Button>
+        </Link>
       </div>
       <div className="flex items-center gap-1.5 flex-wrap">
         {Object.entries(DEVICE_STATUS).map(([key, val]) => (

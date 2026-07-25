@@ -13,6 +13,8 @@ import LabCalendar from '@/pages/LabCalendar';
 import Manage from '@/pages/Manage';
 import Help from '@/pages/Help';
 import Settings from '@/pages/Settings';
+import DeviceTerminal from '@/pages/DeviceTerminal';
+import Unlock from '@/pages/Unlock';
 // Add page imports here
 
 const AuthenticatedApp = () => {
@@ -48,6 +50,8 @@ const AuthenticatedApp = () => {
         <Route path="/help" element={<Help />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/manage" element={<Manage />} />
+        <Route path="/device/:deviceId" element={<DeviceTerminal />} />
+        <Route path="/unlock" element={<Unlock />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
