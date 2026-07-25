@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/i18n";
-import { FlaskConical, LayoutDashboard, ShieldCheck, LogOut, CalendarDays, HelpCircle, Settings as SettingsIcon, Languages, Menu, X, Layers, Sun, Moon } from "lucide-react";
+import { FlaskConical, LayoutDashboard, ShieldCheck, LogOut, CalendarDays, HelpCircle, Settings as SettingsIcon, Languages, Menu, X, Layers, Sun, Moon, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/lib/useTheme";
 
@@ -21,6 +21,7 @@ export default function Layout({ user, role, lab, children }) {
     { to: "/", label: t("nav.labs"), Icon: Layers, show: isMainAdmin },
     { to: "/calendar", label: t("nav.calendar"), Icon: CalendarDays, show: true },
     { to: "/manage", label: t("nav.manage"), Icon: ShieldCheck, show: canManage },
+    { to: "/reports", label: t("nav.reports"), Icon: BarChart3, show: canManage },
     { to: "/help", label: t("nav.help"), Icon: HelpCircle, show: true },
     { to: "/settings", label: t("nav.settings"), Icon: SettingsIcon, show: true }
   ].filter((i) => i.show);

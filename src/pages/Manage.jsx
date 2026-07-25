@@ -4,7 +4,7 @@ import { useLabUser } from "@/lib/useLabUser";
 import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
-import { UserCheck, Ban, Check, Wrench, ShieldCheck, RefreshCw, Users, Cpu, ChevronDown, Monitor } from "lucide-react";
+import { UserCheck, Ban, Check, Wrench, ShieldCheck, RefreshCw, Users, Cpu, ChevronDown, Monitor, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DEVICE_STATUS, USER_STATUS } from "@/lib/labUtils";
 
@@ -72,6 +72,11 @@ export default function Manage() {
   const setRole = async (profile, role) => { await base44.entities.UserProfile.update(profile.id, { role }); loadData(); };
   const setLab = async (profile, labId) => { await base44.entities.UserProfile.update(profile.id, { lab_id: labId || null }); loadData(); };
   const setDeviceStatus = async (device, status) => { await base44.entities.Device.update(device.id, { status }); loadData(); };
+  const removeProfile = async (profile) => {
+    if (!window.confirm(t("manage.confirmRemoveUser"))) return;
+    await base44.entities.UserProfile.delete(profile.id);
+    loadData();
+  };
 
   const labName = (id) => labs.find((l) => l.id === id)?.name || t("manage.unassigned");
 
@@ -113,7 +118,7 @@ export default function Manage() {
             {pendingUsers.map((p) => (
               <UserRow key={p.id} profile={p} labs={labs} isMainAdmin={isMainAdmin}
                 onApprove={() => setStatus(p, "approved")} onBlock={() => setStatus(p, "blocked")}
-                onRole={(r) => setRole(p, r)} onLab={(l) => setLab(p, l)} t={t} />
+                onRole={(r) => setRole(p, r)} onLab={(l) => setLab(p, l)} onRemove={() => removeProfile(p)} t={t} />
             ))}
           </div>
         )}
@@ -125,7 +130,7 @@ export default function Manage() {
             {activeUsers.map((p) => (
               <UserRow key={p.id} profile={p} labs={labs} isMainAdmin={isMainAdmin}
                 onApprove={() => setStatus(p, "approved")} onBlock={() => setStatus(p, "blocked")}
-                onRole={(r) => setRole(p, r)} onLab={(l) => setLab(p, l)} t={t} />
+                onRole={(r) => setRole(p, r)} onLab={(l) => setLab(p, l)} onRemove={() => removeProfile(p)} t={t} />
             ))}
           </div>
         </Section>
@@ -169,7 +174,7 @@ function Stat({ icon, label, value, tone }) {
   );
 }
 
-function UserRow({ profile, labs, isMainAdmin, onApprove, onBlock, onRole, onLab, t }) {
+function UserRow({ profile, labs, isMainAdmin, onApprove, onBlock, onRole, onLab, onRemove, t }) {
   const us = USER_STATUS[profile.status] || USER_STATUS.pending;
   const tones = {
     amber: "bg-amber-500/15 text-amber-400 border-amber-500/20",
@@ -200,6 +205,7 @@ function UserRow({ profile, labs, isMainAdmin, onApprove, onBlock, onRole, onLab
         {profile.status !== "blocked" && (
           <Button size="sm" variant="outline" className="h-8 gap-1 text-rose-400 border-rose-500/20 hover:bg-rose-500/10" onClick={onBlock}><Ban className="w-3.5 h-3.5" />{t("manage.block")}</Button>
         )}
+        <Button size="icon" variant="ghost" className="h-8 w-8 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10" title={t("manage.remove")} onClick={onRemove}><Trash2 className="w-3.5 h-3.5" /></Button>
       </div>
     </div>
   );
