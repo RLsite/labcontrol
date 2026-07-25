@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { X, CalendarPlus, CheckCircle2, ExternalLink } from "lucide-react";
+import { X, CalendarPlus, CheckCircle2, ExternalLink, CalendarDays } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/i18n";
-import { googleCalendarUrl, formatDateTime } from "@/lib/labUtils";
+import { googleCalendarUrl, outlookCalendarUrl, formatDateTime } from "@/lib/labUtils";
 
 export default function ReservationModal({ devices, user, labId, onClose, onSaved }) {
   const { t, lang } = useLang();
@@ -41,15 +42,15 @@ export default function ReservationModal({ devices, user, labId, onClose, onSave
     }
   };
 
-  const gcalLink = done
-    ? googleCalendarUrl({
-        title: `Reservation: ${selectedDevice?.name || ""}`,
-        startISO: done.startISO,
-        endISO: done.endISO,
-        details: purpose ? `Purpose: ${purpose}` : "",
-        location: selectedDevice?.location || ""
-      })
-    : "";
+  const ev = done ? {
+    title: `Reservation: ${selectedDevice?.name || ""}`,
+    startISO: done.startISO,
+    endISO: done.endISO,
+    details: purpose ? `Purpose: ${purpose}` : "",
+    location: selectedDevice?.location || ""
+  } : null;
+  const gcalLink = ev ? googleCalendarUrl(ev) : "";
+  const outlookLink = ev ? outlookCalendarUrl(ev) : "";
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -72,13 +73,25 @@ export default function ReservationModal({ devices, user, labId, onClose, onSave
             </div>
             <h4 className="font-heading font-bold text-white text-lg">{t("reserve.saved")}</h4>
             <p className="text-sm text-slate-400 mt-1">{selectedDevice?.name} · {formatDateTime(done.startISO, lang)}</p>
-            <a href={gcalLink} target="_blank" rel="noreferrer">
-              <Button className="mt-5 w-full gap-2 aestro-gradient hover:opacity-90 text-white">
-                <ExternalLink className="w-4 h-4" /> {t("reserve.syncGoogle")}
-              </Button>
-            </a>
+            <div className="mt-5 space-y-2">
+              <a href={gcalLink} target="_blank" rel="noreferrer">
+                <Button className="w-full gap-2 aestro-gradient hover:opacity-90 text-white">
+                  <ExternalLink className="w-4 h-4" /> {t("reserve.syncGoogle")}
+                </Button>
+              </a>
+              <a href={outlookLink} target="_blank" rel="noreferrer">
+                <Button variant="outline" className="w-full gap-2 text-slate-200 border-white/10 hover:bg-white/5">
+                  <ExternalLink className="w-4 h-4" /> {t("reserve.syncOutlook")}
+                </Button>
+              </a>
+              <Link to="/calendar" onClick={onClose}>
+                <Button variant="ghost" className="w-full gap-2 text-slate-300 hover:bg-white/5">
+                  <CalendarDays className="w-4 h-4" /> {t("reserve.viewLocal")}
+                </Button>
+              </Link>
+            </div>
             <p className="text-[11px] text-slate-500 mt-2">{t("reserve.syncNote")}</p>
-            <Button variant="ghost" className="mt-3 w-full text-slate-300" onClick={onClose}>{t("common.close")}</Button>
+            <Button variant="ghost" className="mt-1 w-full text-slate-400" onClick={onClose}>{t("common.close")}</Button>
           </div>
         ) : (
           <form onSubmit={submit} className="p-5 space-y-4">

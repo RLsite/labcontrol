@@ -5,7 +5,7 @@ import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, Clock, ExternalLink, Inbox, ChevronDown } from "lucide-react";
-import { formatDate, googleCalendarUrl, dayKey, formatTime } from "@/lib/labUtils";
+import { formatDate, googleCalendarUrl, outlookCalendarUrl, dayKey, formatTime } from "@/lib/labUtils";
 
 export default function LabCalendar() {
   const labUser = useLabUser();
@@ -112,11 +112,13 @@ export default function LabCalendar() {
               </div>
               <div className="space-y-2">
                 {items.map((r) => {
-                  const gcal = googleCalendarUrl({
+                  const ev = {
                     title: `Reservation: ${r.device_name}`,
                     startISO: r.start_time, endISO: r.end_time,
                     details: r.purpose ? `Purpose: ${r.purpose}` : "", location: ""
-                  });
+                  };
+                  const gcal = googleCalendarUrl(ev);
+                  const outlook = outlookCalendarUrl(ev);
                   return (
                     <div key={r.id} className="rounded-2xl glass p-4 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3 min-w-0">
@@ -132,12 +134,14 @@ export default function LabCalendar() {
                           </div>
                         </div>
                       </div>
-                      <a href={gcal} target="_blank" rel="noreferrer">
-                        <Button variant="ghost" className="gap-2 text-primary hover:bg-white/10">
-                          <ExternalLink className="w-4 h-4" />
-                          <span className="hidden sm:inline">{t("settings.connections.googleBtn")}</span>
-                        </Button>
-                      </a>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <a href={gcal} target="_blank" rel="noreferrer" title="Google">
+                          <Button variant="ghost" size="icon" className="h-9 w-9 text-sky-400 hover:bg-white/10"><ExternalLink className="w-4 h-4" /></Button>
+                        </a>
+                        <a href={outlook} target="_blank" rel="noreferrer" title="Outlook">
+                          <Button variant="ghost" size="icon" className="h-9 w-9 text-blue-400 hover:bg-white/10"><ExternalLink className="w-4 h-4" /></Button>
+                        </a>
+                      </div>
                     </div>
                   );
                 })}

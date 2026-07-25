@@ -60,6 +60,19 @@ export function googleCalendarUrl({ title, startISO, endISO, details, location }
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
+export function outlookCalendarUrl({ title, startISO, endISO, details, location }) {
+  const params = new URLSearchParams({
+    path: "/calendar/action/compose",
+    rru: "addevent",
+    startdt: new Date(startISO).toISOString(),
+    enddt: new Date(endISO).toISOString(),
+    subject: title,
+    body: details || "",
+    location: location || ""
+  });
+  return `https://outlook.live.com/calendar/0/deeplink/calendar/compose?${params.toString()}`;
+}
+
 export function dayKey(iso) {
   const d = new Date(iso);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
