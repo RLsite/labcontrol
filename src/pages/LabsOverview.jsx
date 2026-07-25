@@ -70,7 +70,7 @@ export default function LabsOverview({ labUser }) {
           {labs.map((lab) => {
             const s = stats(lab.id);
             return (
-              <Link key={lab.id} to={`/calendar?lab=${lab.id}`} className="group rounded-3xl glass hover:bg-white/[0.07] hover:border-white/20 transition-all p-5 flex flex-col">
+              <Link key={lab.id} to={`/manage-lab/${lab.id}`} className="group rounded-3xl glass hover:bg-white/[0.07] hover:border-white/20 transition-all p-5 flex flex-col">
                 <div className="flex items-start justify-between gap-2">
                   <div className="w-11 h-11 rounded-2xl aestro-gradient flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
                     <FlaskConical className="w-5 h-5 text-white" />
