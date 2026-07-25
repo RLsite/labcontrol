@@ -4,8 +4,9 @@ import { useLabUser } from "@/lib/useLabUser";
 import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, ExternalLink, Inbox, ChevronDown } from "lucide-react";
-import { formatDate, googleCalendarUrl, outlookCalendarUrl, dayKey, formatTime } from "@/lib/labUtils";
+import { CalendarDays, Clock, Inbox, ChevronDown } from "lucide-react";
+import { formatDate, dayKey, formatTime } from "@/lib/labUtils";
+import LocalCalendar from "@/components/lab/LocalCalendar";
 
 export default function LabCalendar() {
   const labUser = useLabUser();
@@ -103,6 +104,8 @@ export default function LabCalendar() {
         </div>
       ) : (
         <div className="space-y-6">
+          <LocalCalendar reservations={reservations} lang={lang} />
+
           {grouped.map(([day, items]) => (
             <div key={day}>
               <div className="flex items-center gap-3 mb-3">
@@ -111,40 +114,21 @@ export default function LabCalendar() {
                 <span className="h-px flex-1 bg-white/10" />
               </div>
               <div className="space-y-2">
-                {items.map((r) => {
-                  const ev = {
-                    title: `Reservation: ${r.device_name}`,
-                    startISO: r.start_time, endISO: r.end_time,
-                    details: r.purpose ? `Purpose: ${r.purpose}` : "", location: ""
-                  };
-                  const gcal = googleCalendarUrl(ev);
-                  const outlook = outlookCalendarUrl(ev);
-                  return (
-                    <div key={r.id} className="rounded-2xl glass p-4 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
-                          <Clock className="w-5 h-5" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-medium text-white truncate">{r.device_name}</div>
-                          <div className="text-xs text-slate-400">
-                            {formatTime(r.start_time, lang)} — {formatTime(r.end_time, lang)}
-                            {r.user_name ? ` · ${r.user_name}` : ""}
-                            {r.purpose ? ` · ${r.purpose}` : ""}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <a href={gcal} target="_blank" rel="noreferrer" title="Google">
-                          <Button variant="ghost" size="icon" className="h-9 w-9 text-sky-400 hover:bg-white/10"><ExternalLink className="w-4 h-4" /></Button>
-                        </a>
-                        <a href={outlook} target="_blank" rel="noreferrer" title="Outlook">
-                          <Button variant="ghost" size="icon" className="h-9 w-9 text-blue-400 hover:bg-white/10"><ExternalLink className="w-4 h-4" /></Button>
-                        </a>
+                {items.map((r) => (
+                  <div key={r.id} className="rounded-2xl glass p-4 flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-xl bg-primary/15 text-primary flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium text-white truncate">{r.device_name}</div>
+                      <div className="text-xs text-slate-400">
+                        {formatTime(r.start_time, lang)} — {formatTime(r.end_time, lang)}
+                        {r.user_name ? ` · ${r.user_name}` : ""}
+                        {r.purpose ? ` · ${r.purpose}` : ""}
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
               </div>
             </div>
           ))}
