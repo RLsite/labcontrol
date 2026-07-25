@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useLabUser } from "@/lib/useLabUser";
+import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import DeviceCard from "@/components/lab/DeviceCard";
 import ActiveSessionBanner from "@/components/lab/ActiveSessionBanner";
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const labUser = useLabUser();
+  const { t, lang } = useLang();
   const [devices, setDevices] = useState([]);
   const [activeSession, setActiveSession] = useState(null);
   const [reservations, setReservations] = useState([]);
@@ -62,7 +64,7 @@ export default function Home() {
   const canActivate = (device) => {
     if (isAdmin) return { ok: true };
     if (device.requires_training && !certifiedIds.has(device.id)) {
-      return { ok: false, reason: `נדרשת הדרכה: ${device.training_name || device.name}` };
+      return { ok: false, reason: `${t("device.trainingPrefix")} ${device.training_name || device.name}` };
     }
     return { ok: true };
   };
@@ -70,7 +72,7 @@ export default function Home() {
   const handleActivate = async (device) => {
     const check = canActivate(device);
     if (!check.ok) { showToast(check.reason); return; }
-    if (activeSession) { showToast("יש כבר סשן פעיל. סיים אותו לפני הפעלת מכשיר נוסף."); return; }
+    if (activeSession) { showToast(t("toast.activeExists")); return; }
     await base44.entities.LabSession.create({
       device_id: device.id,
       device_name: device.name,
@@ -120,16 +122,16 @@ export default function Home() {
       <section>
         <div className="flex items-center justify-between mb-5">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">מכשירי המעבדה</h1>
-            <p className="text-sm text-slate-500 mt-0.5">בחר מכשיר להפעלה או הזמן מראש</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t("device.title")}</h1>
+            <p className="text-sm text-slate-500 mt-0.5">{t("device.subtitle")}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" onClick={loadData} title="רענן">
+            <Button variant="outline" size="icon" onClick={loadData} title={t("common.refresh")}>
               <RefreshCw className="w-4 h-4" />
             </Button>
             <Button onClick={() => setShowReserve(true)} className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
               <CalendarPlus className="w-4 h-4" />
-              <span className="hidden sm:inline">הזמן מכשיר</span>
+              <span className="hidden sm:inline">{t("home.reserveBtn")}</span>
             </Button>
           </div>
         </div>

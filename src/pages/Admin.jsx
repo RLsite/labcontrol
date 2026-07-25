@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useLabUser } from "@/lib/useLabUser";
+import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
 import { UserCheck, Ban, Check, Wrench, ShieldCheck, RefreshCw, Users, Cpu } from "lucide-react";
-import { DEVICE_STATUS, USER_STATUS, formatDateTime } from "@/lib/labUtils";
+import { DEVICE_STATUS, USER_STATUS } from "@/lib/labUtils";
 
 export default function Admin() {
   const labUser = useLabUser();
+  const { t } = useLang();
   const [profiles, setProfiles] = useState([]);
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,8 +45,8 @@ export default function Admin() {
       <Layout user={labUser.user} isAdmin={false} profile={labUser.profile}>
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <ShieldCheck className="w-10 h-10 text-slate-300 mb-3" />
-          <h2 className="text-lg font-bold text-slate-700">אין הרשאה</h2>
-          <p className="text-sm text-slate-500">פאנל הניהול זמין למנהלי המעבדה בלבד.</p>
+          <h2 className="text-lg font-bold text-slate-700">{t("admin.noAccess")}</h2>
+          <p className="text-sm text-slate-500">{t("admin.noAccessDesc")}</p>
         </div>
       </Layout>
     );
@@ -67,45 +69,42 @@ export default function Admin() {
     <Layout user={labUser.user} isAdmin={true} profile={labUser.profile}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">פאנל ניהול</h1>
-          <p className="text-sm text-slate-500 mt-0.5">ניהול משתמשים וסטטוס מכשירים</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t("admin.title")}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{t("admin.subtitle")}</p>
         </div>
-        <Button variant="outline" size="icon" onClick={loadData} title="רענן">
+        <Button variant="outline" size="icon" onClick={loadData} title={t("common.refresh")}>
           <RefreshCw className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* סטטיסטיקות */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-        <Stat icon={<Users className="w-4 h-4" />} label="ממתינים לאישור" value={pendingUsers.length} tone="amber" />
-        <Stat icon={<UserCheck className="w-4 h-4" />} label="משתמשים מאושרים" value={profiles.filter(p => p.status === "approved").length} tone="emerald" />
-        <Stat icon={<Cpu className="w-4 h-4" />} label="מכשירים פנויים" value={devices.filter(d => d.status === "available").length} tone="indigo" />
-        <Stat icon={<Wrench className="w-4 h-4" />} label="בבדיקה/תקול" value={devices.filter(d => d.status === "maintenance").length} tone="rose" />
+        <Stat icon={<Users className="w-4 h-4" />} label={t("admin.stats.pending")} value={pendingUsers.length} tone="amber" />
+        <Stat icon={<UserCheck className="w-4 h-4" />} label={t("admin.stats.approved")} value={profiles.filter(p => p.status === "approved").length} tone="emerald" />
+        <Stat icon={<Cpu className="w-4 h-4" />} label={t("admin.stats.available")} value={devices.filter(d => d.status === "available").length} tone="indigo" />
+        <Stat icon={<Wrench className="w-4 h-4" />} label={t("admin.stats.maintenance")} value={devices.filter(d => d.status === "maintenance").length} tone="rose" />
       </div>
 
-      {/* משתמשים ממתינים */}
       <section className="mb-8">
         <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
           <Users className="w-5 h-5 text-amber-600" />
-          משתמשים הממתינים לאישור
+          {t("admin.pending")}
         </h2>
         {loading ? (
           <SkeletonRows />
         ) : pendingUsers.length === 0 ? (
-          <Empty text="אין משתמשים הממתינים לאישור." />
+          <Empty text={t("admin.noPending")} />
         ) : (
           <div className="space-y-2">
             {pendingUsers.map((p) => (
-              <UserRow key={p.id} profile={p} onApprove={() => setStatus(p, "approved")} onBlock={() => setStatus(p, "blocked")} pending />
+              <UserRow key={p.id} profile={p} onApprove={() => setStatus(p, "approved")} onBlock={() => setStatus(p, "blocked")} />
             ))}
           </div>
         )}
       </section>
 
-      {/* משתמשים אחרים */}
       {otherUsers.length > 0 && (
         <section className="mb-8">
-          <h2 className="text-lg font-bold text-slate-900 mb-3">משתמשים פעילים</h2>
+          <h2 className="text-lg font-bold text-slate-900 mb-3">{t("admin.active")}</h2>
           <div className="space-y-2">
             {otherUsers.map((p) => (
               <UserRow key={p.id} profile={p}
@@ -116,11 +115,10 @@ export default function Admin() {
         </section>
       )}
 
-      {/* ניהול מכשירים */}
       <section>
         <h2 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
           <Cpu className="w-5 h-5 text-indigo-600" />
-          ניהול סטטוס מכשירים
+          {t("admin.devices")}
         </h2>
         {loading ? (
           <SkeletonRows />
@@ -154,7 +152,8 @@ function Stat({ icon, label, value, tone }) {
   );
 }
 
-function UserRow({ profile, onApprove, onBlock, pending }) {
+function UserRow({ profile, onApprove, onBlock }) {
+  const { t } = useLang();
   const us = USER_STATUS[profile.status] || USER_STATUS.pending;
   const tones = {
     amber: "bg-amber-50 text-amber-700 border-amber-200",
@@ -175,15 +174,15 @@ function UserRow({ profile, onApprove, onBlock, pending }) {
         </div>
       </div>
       <div className="flex items-center gap-2 shrink-0">
-        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${tones[us.color]}`}>{us.label}</span>
+        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${tones[us.color]}`}>{t(`status.${profile.status}`)}</span>
         {profile.status !== "approved" && (
           <Button size="sm" className="h-8 gap-1 bg-emerald-600 hover:bg-emerald-700 text-white" onClick={onApprove}>
-            <Check className="w-3.5 h-3.5" /> אשר
+            <Check className="w-3.5 h-3.5" /> {t("admin.approve")}
           </Button>
         )}
         {profile.status !== "blocked" && (
           <Button size="sm" variant="outline" className="h-8 gap-1 text-rose-600 border-rose-200 hover:bg-rose-50" onClick={onBlock}>
-            <Ban className="w-3.5 h-3.5" /> חסום
+            <Ban className="w-3.5 h-3.5" /> {t("admin.block")}
           </Button>
         )}
       </div>
@@ -192,6 +191,7 @@ function UserRow({ profile, onApprove, onBlock, pending }) {
 }
 
 function DeviceAdminRow({ device, onSet }) {
+  const { t } = useLang();
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-3 flex items-center justify-between gap-3 flex-wrap">
       <div className="flex items-center gap-3">
@@ -213,7 +213,7 @@ function DeviceAdminRow({ device, onSet }) {
             onClick={() => onSet(key)}
           >
             <span className={`w-2 h-2 rounded-full ${val.dot}`} />
-            {val.label}
+            {t(`status.${key}`)}
           </Button>
         ))}
       </div>

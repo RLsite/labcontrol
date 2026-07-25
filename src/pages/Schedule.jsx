@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { useLabUser } from "@/lib/useLabUser";
+import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, ExternalLink, Inbox, CalendarPlus } from "lucide-react";
-import { formatDate, googleCalendarUrl, dayKey } from "@/lib/labUtils";
+import { CalendarDays, Clock, ExternalLink, Inbox } from "lucide-react";
+import { formatDate, googleCalendarUrl, dayKey, formatTime } from "@/lib/labUtils";
 
 export default function Schedule() {
   const labUser = useLabUser();
+  const { t, lang } = useLang();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,8 +54,8 @@ export default function Schedule() {
         <div className="flex items-center gap-2">
           <CalendarDays className="w-6 h-6 text-indigo-600" />
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">לוח זמנים</h1>
-            <p className="text-sm text-slate-500 mt-0.5">ההזמנות שלך וסנכרון ל-Google Calendar</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{t("schedule.title")}</h1>
+            <p className="text-sm text-slate-500 mt-0.5">{t("schedule.subtitle")}</p>
           </div>
         </div>
       </div>
@@ -67,8 +69,8 @@ export default function Schedule() {
       ) : grouped.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-white py-16 text-center">
           <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-semibold text-slate-700">אין הזמנות מתוכננות</h3>
-          <p className="text-sm text-slate-500 mt-1">חזור ללוח הבקרה כדי להזמין מכשיר.</p>
+          <h3 className="font-semibold text-slate-700">{t("schedule.noTitle")}</h3>
+          <p className="text-sm text-slate-500 mt-1">{t("schedule.noDesc")}</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -76,17 +78,16 @@ export default function Schedule() {
             <div key={day}>
               <div className="flex items-center gap-3 mb-3">
                 <CalendarDays className="w-4 h-4 text-indigo-500" />
-                <h2 className="text-sm font-bold text-slate-700">{formatDate(items[0].start_time)}</h2>
+                <h2 className="text-sm font-bold text-slate-700">{formatDate(items[0].start_time, lang)}</h2>
                 <span className="h-px flex-1 bg-slate-200" />
               </div>
               <div className="space-y-2">
                 {items.map((r) => {
                   const gcal = googleCalendarUrl({
-                    title: `הזמנה: ${r.device_name}`,
+                    title: `${t("reserve.title")}: ${r.device_name}`,
                     startISO: r.start_time,
                     endISO: r.end_time,
-                    details: r.purpose ? `מטרה: ${r.purpose}` : "",
-                    location: ""
+                    details: r.purpose ? `${t("reserve.purpose")}: ${r.purpose}` : ""
                   });
                   return (
                     <div key={r.id} className="rounded-xl border border-slate-200 bg-white p-4 flex items-center justify-between gap-3">
@@ -97,9 +98,7 @@ export default function Schedule() {
                         <div>
                           <div className="font-semibold text-slate-900">{r.device_name}</div>
                           <div className="text-xs text-slate-500">
-                            {new Date(r.start_time).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
-                            {" — "}
-                            {new Date(r.end_time).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
+                            {formatTime(r.start_time, lang)} — {formatTime(r.end_time, lang)}
                             {r.purpose ? ` · ${r.purpose}` : ""}
                           </div>
                         </div>
@@ -107,7 +106,7 @@ export default function Schedule() {
                       <a href={gcal} target="_blank" rel="noreferrer">
                         <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
                           <ExternalLink className="w-4 h-4" />
-                          <span className="hidden sm:inline">Google Calendar</span>
+                          <span className="hidden sm:inline">{t("schedule.googleBtn")}</span>
                         </Button>
                       </a>
                     </div>

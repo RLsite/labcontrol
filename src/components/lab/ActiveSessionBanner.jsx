@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Activity, Square, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatDuration } from "@/lib/labUtils";
+import { useLang } from "@/lib/i18n";
+import { formatDuration, formatTime } from "@/lib/labUtils";
 
 export default function ActiveSessionBanner({ session, onCheckout }) {
+  const { t, lang } = useLang();
   const [elapsed, setElapsed] = useState(0);
   const [ending, setEnding] = useState(false);
 
@@ -37,18 +39,18 @@ export default function ActiveSessionBanner({ session, onCheckout }) {
           <div>
             <div className="flex items-center gap-2 text-xs font-medium text-white/80">
               <Activity className="w-3.5 h-3.5" />
-              סשן עבודה פעיל
+              {t("session.active")}
             </div>
             <div className="text-lg font-bold mt-0.5">{session.device_name}</div>
             <div className="text-xs text-white/70 mt-0.5">
-              התחיל ב-{new Date(session.start_time).toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" })}
+              {t("session.startedAt")}{formatTime(session.start_time, lang)}
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
           <div className="text-center">
-            <div className="text-[11px] text-white/70 mb-1">זמן שחלף</div>
+            <div className="text-[11px] text-white/70 mb-1">{t("session.elapsed")}</div>
             <div className="text-2xl sm:text-3xl font-mono font-bold tabular-nums tracking-tight">
               {formatDuration(elapsed)}
             </div>
@@ -60,7 +62,7 @@ export default function ActiveSessionBanner({ session, onCheckout }) {
             className="bg-white text-indigo-700 hover:bg-white/90 gap-2 font-semibold shadow-sm"
           >
             <Square className="w-4 h-4 fill-current" />
-            {ending ? "מסיים..." : "סיום עבודה / Check-out"}
+            {ending ? t("session.checkingOut") : t("session.checkout")}
           </Button>
         </div>
       </div>
