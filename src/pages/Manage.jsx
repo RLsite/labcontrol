@@ -20,6 +20,7 @@ export default function Manage() {
   const [profiles, setProfiles] = useState([]);
   const [devices, setDevices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [labFilter, setLabFilter] = useState("all");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -59,8 +60,13 @@ export default function Manage() {
     );
   }
 
-  const pendingUsers = profiles.filter((p) => p.status === "pending");
-  const activeUsers = profiles.filter((p) => p.status !== "pending");
+  const visibleProfiles = isMainAdmin && labFilter !== "all"
+    ? (labFilter === "unassigned"
+      ? profiles.filter((p) => !p.lab_id || !labs.find((l) => l.id === p.lab_id))
+      : profiles.filter((p) => p.lab_id === labFilter))
+    : profiles;
+  const pendingUsers = visibleProfiles.filter((p) => p.status === "pending");
+  const activeUsers = visibleProfiles.filter((p) => p.status !== "pending");
 
   const setStatus = async (profile, status) => { await base44.entities.UserProfile.update(profile.id, { status }); loadData(); };
   const setRole = async (profile, role) => { await base44.entities.UserProfile.update(profile.id, { role }); loadData(); };
@@ -81,10 +87,25 @@ export default function Manage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         <Stat icon={<Users className="w-4 h-4" />} label={t("admin.stats.pending")} value={pendingUsers.length} tone="amber" />
-        <Stat icon={<UserCheck className="w-4 h-4" />} label={t("admin.stats.approved")} value={profiles.filter(p => p.status === "approved").length} tone="emerald" />
+        <Stat icon={<UserCheck className="w-4 h-4" />} label={t("admin.stats.approved")} value={visibleProfiles.filter(p => p.status === "approved").length} tone="emerald" />
         <Stat icon={<Cpu className="w-4 h-4" />} label={t("admin.stats.available")} value={devices.filter(d => d.status === "available").length} tone="indigo" />
         <Stat icon={<Wrench className="w-4 h-4" />} label={t("admin.stats.maintenance")} value={devices.filter(d => d.status === "maintenance").length} tone="rose" />
       </div>
+
+      {isMainAdmin && (
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-xs text-slate-400">{t("manage.filterByLab")}:</span>
+          <div className="relative">
+            <select value={labFilter} onChange={(e) => setLabFilter(e.target.value)}
+              className="appearance-none rounded-lg bg-white/5 border border-white/10 h-8 pl-3 pr-8 text-xs text-white focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="all" className="bg-slate-900">{t("manage.allLabs")}</option>
+              <option value="unassigned" className="bg-slate-900">{t("manage.unassigned")}</option>
+              {labs.map((l) => <option key={l.id} value={l.id} className="bg-slate-900">{l.name}</option>)}
+            </select>
+            <ChevronDown className="w-3 h-3 text-slate-400 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+        </div>
+      )}
 
       <Section title={t("manage.pending")} icon={<Users className="w-5 h-5 text-amber-400" />}>
         {loading ? <SkeletonRows /> : pendingUsers.length === 0 ? <Empty text={t("manage.noPending")} /> : (

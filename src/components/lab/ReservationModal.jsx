@@ -6,10 +6,10 @@ import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/i18n";
 import { googleCalendarUrl, outlookCalendarUrl, formatDateTime } from "@/lib/labUtils";
 
-export default function ReservationModal({ devices, user, labId, onClose, onSaved }) {
+export default function ReservationModal({ devices, user, labId, onClose, onSaved, initialStart = "" }) {
   const { t, lang } = useLang();
   const [deviceId, setDeviceId] = useState(devices[0]?.id || "");
-  const [start, setStart] = useState("");
+  const [start, setStart] = useState(initialStart);
   const [end, setEnd] = useState("");
   const [purpose, setPurpose] = useState("");
   const [saving, setSaving] = useState(false);

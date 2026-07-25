@@ -4,7 +4,7 @@ import { formatTime } from "@/lib/labUtils";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Clock } from "lucide-react";
 
-export default function LocalCalendar({ reservations, lang }) {
+export default function LocalCalendar({ reservations, lang, onDayClick }) {
   const { t } = useLang();
   const today = new Date();
   const [viewYear, setViewYear] = useState(today.getFullYear());
@@ -87,7 +87,7 @@ export default function LocalCalendar({ reservations, lang }) {
           const items = resByDay.get(key) || [];
           const todayCls = isToday(d);
           return (
-            <div key={i} className={`min-h-[72px] sm:min-h-[96px] rounded-xl p-1.5 flex flex-col gap-1 ${todayCls ? "bg-primary/10 border border-primary/30" : "bg-white/[0.02] border border-white/5"}`}>
+            <div key={i} onClick={() => onDayClick?.(d)} className={`min-h-[72px] sm:min-h-[96px] rounded-xl p-1.5 flex flex-col gap-1 cursor-pointer transition-colors hover:bg-white/[0.06] ${todayCls ? "bg-primary/10 border border-primary/30" : "bg-white/[0.02] border border-white/5"}`}>
               <span className={`text-xs font-medium ${todayCls ? "text-primary" : "text-slate-400"}`}>{d.getDate()}</span>
               <div className="flex flex-col gap-0.5 overflow-hidden">
                 {items.slice(0, 3).map((r) => (

@@ -4,9 +4,10 @@ import { useLabUser } from "@/lib/useLabUser";
 import { useLang } from "@/lib/i18n";
 import Layout from "@/components/lab/Layout";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, Clock, Inbox, ChevronDown } from "lucide-react";
+import { CalendarDays, Clock, Inbox, ChevronDown, CalendarPlus } from "lucide-react";
 import { formatDate, dayKey, formatTime } from "@/lib/labUtils";
 import LocalCalendar from "@/components/lab/LocalCalendar";
+import ReservationModal from "@/components/lab/ReservationModal";
 
 export default function LabCalendar() {
   const labUser = useLabUser();
@@ -17,6 +18,9 @@ export default function LabCalendar() {
   const [selectedLabId, setSelectedLabId] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [devices, setDevices] = useState([]);
+  const [showReserve, setShowReserve] = useState(false);
+  const [prefillStart, setPrefillStart] = useState("");
 
   // For main admin: load all labs. For others: their lab.
   useEffect(() => {
@@ -38,8 +42,12 @@ export default function LabCalendar() {
     if (!selectedLabId) return;
     setLoading(true);
     try {
-      const res = await base44.entities.Reservation.filter({ lab_id: selectedLabId });
+      const [res, devs] = await Promise.all([
+        base44.entities.Reservation.filter({ lab_id: selectedLabId }),
+        base44.entities.Device.filter({ lab_id: selectedLabId })
+      ]);
       setReservations(res.filter((r) => r.status !== "cancelled").sort((a, b) => new Date(a.start_time) - new Date(b.start_time)));
+      setDevices(devs);
     } finally {
       setLoading(false);
     }
@@ -68,6 +76,15 @@ export default function LabCalendar() {
 
   const selectedLab = labs.find((l) => l.id === selectedLabId) || labUser.lab;
 
+  const handleDayClick = (date) => {
+    if (!date) return;
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    setPrefillStart(`${yyyy}-${mm}-${dd}T09:00`);
+    setShowReserve(true);
+  };
+
   return (
     <Layout user={labUser.user} role={labUser.role} lab={selectedLab}>
       <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
@@ -80,6 +97,11 @@ export default function LabCalendar() {
             <p className="text-sm text-slate-400">{selectedLab?.name || t("lab.labCalendarSub")}</p>
           </div>
         </div>
+
+        <Button onClick={() => { setPrefillStart(""); setShowReserve(true); }} disabled={devices.length === 0}
+          className="gap-2 aestro-gradient hover:opacity-90 text-white">
+          <CalendarPlus className="w-4 h-4" /><span className="hidden sm:inline">{t("reserve.newBtn")}</span>
+        </Button>
 
         {isMainAdmin && labs.length > 0 && (
           <div className="relative">
@@ -97,14 +119,21 @@ export default function LabCalendar() {
 
       {loading ? (
         <div className="space-y-3">{[1, 2, 3].map((i) => <div key={i} className="h-20 rounded-3xl glass animate-pulse" />)}</div>
-      ) : grouped.length === 0 ? (
+      ) : devices.length === 0 ? (
         <div className="rounded-3xl glass border-dashed border-white/15 py-16 text-center">
           <Inbox className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-          <p className="text-sm text-slate-400">{t("lab.labCalendarSub")}</p>
+          <p className="text-sm text-slate-400">{t("reserve.noDevices")}</p>
         </div>
       ) : (
         <div className="space-y-6">
-          <LocalCalendar reservations={reservations} lang={lang} />
+          <LocalCalendar reservations={reservations} lang={lang} onDayClick={handleDayClick} />
+
+          {grouped.length === 0 && (
+            <div className="rounded-3xl glass border-dashed border-white/15 py-10 text-center">
+              <Inbox className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-sm text-slate-400">{t("lab.calendarEmpty")}</p>
+            </div>
+          )}
 
           {grouped.map(([day, items]) => (
             <div key={day}>
@@ -133,6 +162,11 @@ export default function LabCalendar() {
             </div>
           ))}
         </div>
+      )}
+
+      {showReserve && (
+        <ReservationModal devices={devices} user={labUser.user} labId={selectedLabId} initialStart={prefillStart}
+          onClose={() => setShowReserve(false)} onSaved={loadData} />
       )}
     </Layout>
   );
