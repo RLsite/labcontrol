@@ -6,43 +6,43 @@
 
 @layer base {
   :root {
-    --background: 245 30% 5%;
-    --foreground: 240 10% 96%;
-    --card: 245 25% 8%;
-    --card-foreground: 240 10% 96%;
-    --popover: 245 25% 8%;
-    --popover-foreground: 240 10% 96%;
-    --primary: 240 80% 64%;
+    --background: 240 20% 99%;
+    --foreground: 240 10% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 12%;
+    --primary: 240 80% 58%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 245 22% 13%;
-    --secondary-foreground: 240 10% 96%;
-    --muted: 245 22% 13%;
-    --muted-foreground: 240 8% 62%;
-    --accent: 263 78% 62%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 10% 12%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 44%;
+    --accent: 263 70% 54%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 56%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 245 22% 16%;
-    --input: 245 22% 16%;
-    --ring: 240 80% 64%;
-    --chart-1: 240 80% 64%;
-    --chart-2: 263 78% 62%;
-    --chart-3: 190 80% 55%;
-    --chart-4: 150 65% 55%;
-    --chart-5: 35 90% 60%;
+    --border: 240 6% 88%;
+    --input: 240 6% 88%;
+    --ring: 240 80% 58%;
+    --chart-1: 240 80% 58%;
+    --chart-2: 263 70% 54%;
+    --chart-3: 190 80% 48%;
+    --chart-4: 150 60% 48%;
+    --chart-5: 35 90% 55%;
     --radius: 1rem;
     --font-heading: 'Space Grotesk', 'Heebo', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Heebo', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Space Grotesk', 'Heebo', ui-sans-serif, system-ui, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    --sidebar-background: 245 25% 8%;
-    --sidebar-foreground: 240 10% 80%;
-    --sidebar-primary: 240 80% 64%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 6% 40%;
+    --sidebar-primary: 240 80% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 245 22% 13%;
-    --sidebar-accent-foreground: 240 10% 96%;
-    --sidebar-border: 245 22% 16%;
-    --sidebar-ring: 240 80% 64%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 10% 12%;
+    --sidebar-border: 240 6% 88%;
+    --sidebar-ring: 240 80% 58%;
   }
   .dark {
     --background: 245 30% 5%;
@@ -85,6 +85,7 @@
     @apply border-border outline-ring/50;
   }
   html { color-scheme: dark; }
+  html:not(.dark) { color-scheme: light; }
   body {
     @apply bg-background text-foreground font-body antialiased;
     background-image:
@@ -93,6 +94,12 @@
       radial-gradient(40rem 40rem at 50% 120%, hsl(190 80% 55% / 0.10), transparent 60%);
     background-attachment: fixed;
     min-height: 100vh;
+  }
+  html:not(.dark) body {
+    background-image:
+      radial-gradient(60rem 60rem at 110% -10%, hsl(240 80% 58% / 0.10), transparent 60%),
+      radial-gradient(50rem 50rem at -10% 0%, hsl(263 70% 60% / 0.08), transparent 55%),
+      radial-gradient(40rem 40rem at 50% 120%, hsl(190 80% 55% / 0.07), transparent 60%);
   }
 }
 
@@ -113,3 +120,24 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+/* Light theme surface + text overrides */
+html:not(.dark) .glass {
+  background-color: rgba(0, 0, 0, 0.025);
+  backdrop-filter: blur(20px);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html:not(.dark) .glass-strong {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(32px);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+html:not(.dark) .text-white { color: hsl(240 10% 12%); }
+html:not(.dark) .aestro-gradient.text-white,
+html:not(.dark) .aestro-gradient .text-white,
+html:not(.dark) .bg-primary.text-white,
+html:not(.dark) .bg-emerald-600.text-white { color: #ffffff; }
+html:not(.dark) .text-slate-300 { color: hsl(240 5% 38%); }
+html:not(.dark) .text-slate-400 { color: hsl(240 5% 42%); }
+html:not(.dark) .text-slate-500 { color: hsl(240 5% 48%); }
+html:not(.dark) .text-slate-600 { color: hsl(240 5% 52%); }

@@ -30,6 +30,9 @@
     "training_name": {
       "type": "string"
     },
+    "image_url": {
+      "type": "string"
+    },
     "lab_id": {
       "type": "string"
     }

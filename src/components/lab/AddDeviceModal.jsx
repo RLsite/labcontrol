@@ -1,18 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { ImagePlus, X } from "lucide-react";
 
 export default function AddDeviceModal({ labId, onClose, onSaved }) {
   const { t } = useLang();
+  const fileRef = useRef(null);
   const [form, setForm] = useState({
-    name: "", description: "", category: "", location: "", requires_training: false, training_name: ""
+    name: "", description: "", category: "", location: "", requires_training: false, training_name: "", image_url: ""
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+  const onFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      set("image_url", file_url);
+    } catch (err) {
+      setError(err.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -44,6 +61,24 @@ export default function AddDeviceModal({ labId, onClose, onSaved }) {
           <h3 className="font-heading font-bold text-white">{t("labManage.addDevice")}</h3>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-white"><X className="w-5 h-5" /></button>
         </div>
+
+        {/* Image */}
+        <div>
+          <label className="block text-xs font-medium text-slate-400 mb-1.5">{t("labManage.deviceImage")}</label>
+          {form.image_url ? (
+            <div className="relative w-full h-36 rounded-xl overflow-hidden border border-white/10">
+              <img src={form.image_url} alt="" className="w-full h-full object-cover" />
+              <button type="button" onClick={() => set("image_url", "")} className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"><X className="w-4 h-4" /></button>
+            </div>
+          ) : (
+            <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className="w-full h-36 rounded-xl border border-dashed border-white/15 flex flex-col items-center justify-center gap-2 text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+              <ImagePlus className="w-7 h-7" />
+              <span className="text-xs">{uploading ? t("common.loading") : t("labManage.uploadImage")}</span>
+            </button>
+          )}
+          <input ref={fileRef} type="file" accept="image/*" onChange={onFile} className="hidden" />
+        </div>
+
         <div>
           <label className="block text-xs font-medium text-slate-400 mb-1.5">{t("labManage.deviceName")} *</label>
           <input value={form.name} onChange={(e) => set("name", e.target.value)} required className={field} />
@@ -71,7 +106,7 @@ export default function AddDeviceModal({ labId, onClose, onSaved }) {
           </div>
         )}
         {error && <p className="text-xs text-rose-400">{error}</p>}
-        <Button type="submit" disabled={saving} className="w-full aestro-gradient hover:opacity-90 text-white">{saving ? t("common.loading") : t("common.create")}</Button>
+        <Button type="submit" disabled={saving || uploading} className="w-full aestro-gradient hover:opacity-90 text-white">{saving ? t("common.loading") : t("common.create")}</Button>
       </form>
     </div>
   );

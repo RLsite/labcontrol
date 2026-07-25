@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/i18n";
-import { FlaskConical, LayoutDashboard, ShieldCheck, LogOut, CalendarDays, HelpCircle, Settings as SettingsIcon, Languages, Menu, X, Layers } from "lucide-react";
+import { FlaskConical, LayoutDashboard, ShieldCheck, LogOut, CalendarDays, HelpCircle, Settings as SettingsIcon, Languages, Menu, X, Layers, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/lib/useTheme";
 
 export default function Layout({ user, role, lab, children }) {
   const location = useLocation();
   const { t, lang, setLang } = useLang();
+  const { theme, toggle: toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => { await base44.auth.logout(); };
@@ -59,6 +61,9 @@ export default function Layout({ user, role, lab, children }) {
           </nav>
 
           <div className="flex items-center gap-1.5">
+            <Button variant="ghost" size="icon" onClick={toggleTheme} title={theme === "dark" ? t("common.lightMode") : t("common.darkMode")} className="text-slate-300 hover:text-white">
+              {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => setLang(lang === "he" ? "en" : "he")} title={lang === "he" ? "English" : "עברית"} className="text-slate-300 hover:text-white">
               <Languages className="w-4 h-4" />
             </Button>
